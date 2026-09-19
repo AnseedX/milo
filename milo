@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# ============================================================
+#  milo - one-command launcher for the local offline agent
+#  (macOS / Linux). Ensures the LM Studio server + model are
+#  up, runs the agent against the CURRENT directory, then
+#  frees the GPU on exit.
+#
+#  Setup:  chmod +x milo && put it on your PATH, then run:
+#     milo
+#     milo "add unit tests to main.py"
+#
+#  Override the model with:  export MILO_MODEL=your/model-id
+# ============================================================
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MODEL="${MILO_MODEL:-google/gemma-4-e4b}"
+
+# ensure the LM Studio server is running (idempotent)
+lms server start >/dev/null 2>&1 || true
+
+# ensure the model is loaded; only load if not already present
+if ! lms ps 2>/dev/null | grep -q "$MODEL"; then
+  echo "[milo] Loading $MODEL into GPU, please wait..."
+  lms load "$MODEL" --gpu max --context-length 8192 --ttl 3600 -y >/dev/null 2>&1 || true
+fi
+
+# launch the harness in the current directory, forwarding any args
+python3 "$HERE/agent.py" --repo . --confirm "$@"
+
+# on exit: release the GPU (unload model) and stop the server
+echo
+echo "[milo] Releasing GPU (unloading model, stopping server)..."
+lms unload --all >/dev/null 2>&1 || true
+lms server stop >/dev/null 2>&1 || true
+echo "[milo] GPU released. See you next time."

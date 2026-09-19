@@ -1,0 +1,10 @@
+# Normalize line endings across platforms
+* text=auto eol=lf
+
+# Windows batch launchers must stay CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Shell scripts and the milo launcher must stay LF (shebang safety)
+*.sh   text eol=lf
+milo   text eol=lf

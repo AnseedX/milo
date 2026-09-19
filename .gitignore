@@ -1,0 +1,34 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Go build artifacts
+gemma
+*.exe
+*.test
+*.out
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Local logs
+*.log
+
+# Private Knowledge Base
+BRAINS/
+
+# Editor / harness session config
+.claude/
+.idea/
+.vscode/
+
+# Local-only docs and notes (not for the public repo)
+WINDOWS_PATCHES.md
